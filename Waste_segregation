@@ -1,0 +1,52 @@
+import os
+import random
+import shutil
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+
+
+main_folder = '/content/drive/MyDrive/Waste_segregation/garbage_classification'
+
+
+train_ratio = 0.8
+
+train_dir = '/content/drive/MyDrive/Waste_train'
+test_dir = '/content/drive/MyDrive/Waste_test'
+
+os.makedirs(train_dir, exist_ok=True)
+os.makedirs(test_dir, exist_ok=True)
+
+for class_folder in os.listdir(main_folder):
+    class_path = os.path.join(main_folder, class_folder)
+    if os.path.isdir(class_path):
+        images = [image for image in os.listdir(class_path) if image.endswith('.jpg')]
+
+        random.shuffle(images)
+
+        split_index = int(len(images) * train_ratio)
+
+        train_images = images[:split_index]
+        test_images = images[split_index:]
+
+        # Copy images to train directory
+        for image in train_images:
+            src = os.path.join(class_path, image)
+            dst = os.path.join(train_dir, class_folder, image)
+            os.makedirs(os.path.join(train_dir, class_folder), exist_ok=True)
+            shutil.copy(src, dst)
+
+        # Copy images to test directory
+        for image in test_images:
+            src = os.path.join(class_path, image)
+            dst = os.path.join(test_dir, class_folder, image)
+            os.makedirs(os.path.join(test_dir, class_folder), exist_ok=True)
+            shutil.copy(src, dst)
+
+print("Dataset splitting completed successfully.")
+
+
